@@ -47,8 +47,216 @@
         </style>
         <title></title>
     </head>
+
+         <style>
+/* Floating Panel */
+#ad-panel {
+  position: absolute;
+  top: 60px; 
+  left: 40%;
+  z-index: 9999;
+  background: rgba(255,255,255,0.85);
+  padding: 10px;
+  border-radius: 12px;
+  font-family: Arial, sans-serif;
+  backdrop-filter: blur(4px);
+}
+
+.panel-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.ad-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.custom-icon {
+  width: 42px;
+  height: 55px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: transform 0.2s;
+}
+.custom-icon:hover {
+  transform: scale(1.15);
+}
+
+/* Image Popup Modal */
+#imgModal {
+  display: none;
+  position: fixed;
+  z-index: 20000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+}
+
+#imgModal img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 80%;
+  border-radius: 12px;
+  box-shadow: 0 0 20px black;
+}
+
+#modalCaption {
+  position: absolute;
+  top: calc(50% + 50%); /* below image */
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: left;
+  color: white;
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: semi-bold;  
+
+}
+
+#imgModal:active { display: none; }
+
+ /* Floating Logo (Facebook) */
+        #floating-logo {
+           position: absolute;
+            bottom: -50px;
+            left: 10px;
+            z-index: 9999;
+            cursor: pointer;
+        }
+        #floating-logo img { width: auto; height: 180px; }
+
+</style>
+
     <body>
+
+    <!-- Map Title -->
+    <div id="map-title" style="
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 10px 20px;
+        font-size: 22px;
+        font-weight: bold;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        z-index: 9999;
+    ">
+        MIADP Region XI - Ancestral Domain
+    </div>
+
+    <body>
+        <!-- Floating Icon Panel -->
+<div id="ad-panel">
+
+  <div class="ad-icons">
+    <img src="icons/blaan_tagakaulo.png"
+         class="custom-icon"
+         data-img="images/Blaan_Tagakaulo_IPs.png"
+         data-caption="Known as peace-loving ...."
+         alt="Blaan Tagakaulo IPs">
+
+    <img src="icons/ata_manobo.png"
+         class="custom-icon"
+         data-img="images/Ata_Manobo_IPs.png"
+          data-caption="The Ata-Manobo's ancestors were driven by their quest to have better way of life"
+         alt="Ata-Manobo IPs">
+
+    <img src="icons/bagobo_tagabawa.png"
+         class="custom-icon"
+         data-img="images/Bagobo_Tagabawa_IPs.png"
+          data-caption="Bagobo refers to the people inhabiting the slopes of the highest peak in the court of Mt. Apo
+          , while 'bawa' means south"
+         alt="Bagobo Tagabawa IPs">
+
+    <img src="icons/mansaka.png"
+         class="custom-icon"
+         data-img="images/Mansaka_IPs.png"
+         data-caption="Mansaka was derived from man meaning first and saka meaning to ascend. It means the first
+         people to ascend the mountains or go upstream"
+         alt="Mansaka IPs">
+
+    <img src="icons/mangguangan.png"
+         class="custom-icon"
+         data-img="images/Mangguangan_IPs.png"
+         data-caption="The Mangguangan term is derived from the words Mang and Guangan which refer to people
+         and forest. Hence, Hence they are considered as people living in the forest near rivers and creeks."
+         alt="Mangguangan IPs">
+
+    <img src="icons/mandaya.png"
+         class="custom-icon"
+         data-img="images/Mandaya_IPs.png"
+         data-caption="The Mandaya derived from the word ...."
+         alt="Mansaka IPs">
+  </div>
+</div>
+
+<!-- Modal Image Viewer -->
+<div id="imgModal">
+  <img id="modalImg" src="" alt="">
+  <div id="modalCaption" style="
+        text-align: left;
+        color: white;
+        margin-top: 10px;
+        font-size: 18px;
+        font-weight: semi-bold;
+        "></div>
+</div>
+
+<!-- Floating Logo (click opens Facebook) -->
+    <div id="floating-logo">
+        <a href="https://www.facebook.com/miadp11" target="_blank">
+            <img src="images/4_LOGO_MIADP.png" alt="Your Organization">
+        </a>
+    </div>
+
         <div id="map">
+
+         <!-- Popups -->
+    <div id="popup" class="ol-popup">
+        <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+        <div id="popup-content"></div>
+    </div>
+
+    <!-- JavaScript to handle icon clicks -->
+     <script>
+// Attach click event to all domain icons
+        document.querySelectorAll('.domain-icon').forEach(function(icon){
+            icon.addEventListener('click', function(){
+                var imgSrc = this.getAttribute('data-img');
+                var content = '<b>' + this.alt + '</b><br><img src="' + imgSrc + '" width="300px">';
+                document.getElementById('popup-content').innerHTML = content;
+
+                // Position popup at center of map
+                var mapSize = map.getSize();
+                var center = map.getCoordinateFromPixel([mapSize[0]/2, mapSize[1]/2]);
+                popup.setPosition(center);
+                document.getElementById('popup').style.display = 'block';
+
+            });
+        });
+
+        // Close popup
+        document.getElementById('popup-closer').onclick = function() {
+            document.getElementById('popup').style.display = 'none';
+            return false;
+
+        };
+    </script>
+    
+
+</body>
+
             <div id="popup" class="ol-popup">
                 <a href="#" id="popup-closer" class="ol-popup-closer"></a>
                 <div id="popup-content"></div>
@@ -67,6 +275,24 @@
         <script src="styles/Davaoregion_3_style.js"></script><script src="styles/R11TAR0818255EnBanc_4_style.js"></script><script src="styles/R11TAR0818255_5_style.js"></script><script src="styles/LandClassification_6_style.js"></script><script src="styles/TarragonaBrgyBdry_7_style.js"></script><script src="styles/R11TAR0818255Nofill_8_style.js"></script><script src="styles/R11NEW0116201_9_style.js"></script><script src="styles/LandClassification_10_style.js"></script><script src="styles/NewCorellaBrgyBndry_11_style.js"></script><script src="styles/R11NEW0116201NoFill_12_style.js"></script><script src="styles/R11PAN0908076_13_style.js"></script><script src="styles/LandClassification_14_style.js"></script><script src="styles/Mainithotspringlandscape_15_style.js"></script><script src="styles/KeyBiodiversityArea_16_style.js"></script><script src="styles/MunicipalityBoundary_17_style.js"></script><script src="styles/R11PAN0908076NoFill_18_style.js"></script><script src="styles/R11SCR1005034_19_style.js"></script><script src="styles/LandClassification_20_style.js"></script><script src="styles/KeyBiodiversityArea_21_style.js"></script><script src="styles/ProtectedArea_22_style.js"></script><script src="styles/MANPManagementZones_23_style.js"></script><script src="styles/MunicipalityBoundary_24_style.js"></script><script src="styles/R11SCR1005034NoFill_25_style.js"></script><script src="styles/R11TAL0408071_26_style.js"></script><script src="styles/LandClassification_27_style.js"></script><script src="styles/MunicipalityBoundary_28_style.js"></script><script src="styles/AtaManoboBrgyBndry_29_style.js"></script><script src="styles/R11TAL0408071NoFill_30_style.js"></script><script src="styles/R11MAL0609119_31_style.js"></script><script src="styles/LandClassification_32_style.js"></script><script src="styles/KeyBiodiversityArea_33_style.js"></script><script src="styles/MalitaBrgyBndry_34_style.js"></script><script src="styles/R11MAL0609119NoFill_35_style.js"></script><script src="styles/MIADPRPCO11ANCESTRALDOMAINS_36_style.js"></script>
         <script src="./layers/layers.js" type="text/javascript"></script> 
         <script src="./resources/Autolinker.min.js"></script>
-        <script src="./resources/qgis2web.js"></script>        
+        <script src="./resources/qgis2web.js"></script>    
+    <script>
+document.querySelectorAll(".custom-icon").forEach(icon => {
+  icon.addEventListener("click", () => {
+    let imgSrc = icon.dataset.img;
+    if (!imgSrc) return;
+
+    // show modal
+    document.getElementById("modalImg").src = imgSrc;
+    document.getElementById("imgModal").style.display = "block";
+  });
+});
+
+// close modal when clicked
+document.getElementById("imgModal").addEventListener("click", () => {
+  document.getElementById("imgModal").style.display = "none";
+});
+</script>    
+        
     </body>
 </html>
